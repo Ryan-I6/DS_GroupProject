@@ -87,8 +87,6 @@ server <- function(input, output){
                            )
         df_3 <- df_2 %>% filter(totals>input$TotalCrimes)
         
-        colours <- c(rep("pink"), rep("green"), rep("orange"), rep("red"), rep("blue"), rep("yellow"), rep("dark grey"), rep("light grey"), rep("light blue"), rep("dark green"))
-        
         return(df_3)
         
     })
@@ -106,11 +104,9 @@ server <- function(input, output){
         
     })
     
-    colours <- c(rep("pink",1 ), rep("green", 1), rep("orange",1), rep("red",1), rep("blue", 1), rep("yellow",1), rep("dark grey", 1), rep("light grey", 1), rep("light blue",1), rep("dark green",1))
-    
     output$PlotTCrimes <- renderPlot({
     totalCrimes() %>% 
-            ggplot(aes(x=reorder(years, totals),y= totals, fill= colours ))+
+            ggplot(aes(x=reorder(years, totals),y= totals, fill= years ))+
             geom_col()+
             labs(x=element_blank(), y="Number of cases per year", title = "Total Crime Cases")+
             guides(fill= FALSE)+
