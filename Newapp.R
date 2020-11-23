@@ -12,7 +12,7 @@ ui<- dashboardPage(
     dashboardSidebar(
         selectInput(inputId ="classes_input", label="Select Class", choices=cl), 
         
-        sliderInput("TotalCrimes", "Number of Crimes per year", 1,200,100)
+        sliderInput("TotalCrimes", "Number of Crimes per year", 250,450,150)
     ),
     dashboardBody(
         
@@ -29,7 +29,10 @@ server <- function(input, output){
 
     wdf<-read.csv("crime_data.csv", sep = ",")
     cl <- wdf$classes
-        
+    
+    noNA<-na.omit(wdf)
+    
+    
     
     #ldf<-tibble(melt(wdf,id.vars=c("classes","CRIME_CATEGORY"),variable.name="Years"))
    # aldf<-tibble(melt(wdf,id.vars=c("classes"),variable.name="cl"))
@@ -65,9 +68,24 @@ server <- function(input, output){
     })
     
     totalCrimes <- reactive({
-        df_2<-aldf.agg %>% filter(value>input$TotalCrimes)
         
-        return(df_2)
+        total_06_07 <- sum(as.integer(noNA$April_2006_to_March_2007))
+        total_07_08 <- sum(as.integer(noNA$April_2007_to_March_2008))
+        total_08_09 <- sum(as.integer(noNA$April_2008_to_March_2009))
+        total_09_10 <- sum(as.integer(noNA$April_2009_to_March_2010))
+        total_10_11 <- sum(as.integer(noNA$April_2010_to_March_2011))
+        total_11_12 <- sum(as.integer(noNA$April_2011_to_March_2012))
+        total_12_13 <- sum(as.integer(noNA$April_2012_to_March_2013))
+        total_13_14 <- sum(as.integer(noNA$April_2013_to_March_2014))
+        total_14_15 <- sum(as.integer(noNA$April_2014_to_March_2015))
+        total_15_16 <- sum(as.integer(noNA$April_2015_to_March_2016))
+        
+        YEARtotals<-c(total_06_07, total_07_08, total_08_09, total_09_10, total_10_11, total_11_12, total_12_13,total_13_14,total_14_15, total_15_16)
+        
+        df_2 <- data.frame(years=c("April_2006_to_March_2007","April_2007_to_March_2008","April_2008_to_March_2009","April_2009_to_March_2010","April_2010_to_March_2011","April_2011_to_March_2012","April_2012_to_March_2013","April_2013_to_March_2014","April_2014_to_March_2015","April_2015_to_March_2016"),
+                           totals = YEARtotals)
+        df_3 <- df_2 %>% filter(totals>input$TotalCrimes)
+        return(df_3)
     })
    # mutate(Years= fct_reorder(value, Years)) %>%
     
@@ -84,8 +102,8 @@ server <- function(input, output){
     }, width = 850, height = 550)
     
     output$PlotTCrimes <- renderPlot({
-        totalCrimes() %>% 
-            ggplot(aes(x= reorder(Years, value),y=value, fill = Years))+
+    totalCrimes() %>% 
+            ggplot(aes(x=reorder(years, totals),y= totals,fill=totals))+
             geom_col()+
             labs(x=element_blank(), y="Number of cases per year", title = "Total Crime Cases")+
             guides(fill= FALSE)+
@@ -96,4 +114,7 @@ server <- function(input, output){
 }
 
 shinyApp(ui = ui, server=server)
+
+
+
 
