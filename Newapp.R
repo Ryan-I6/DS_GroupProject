@@ -8,14 +8,19 @@ library(DT)
 
 
 ui<- dashboardPage(
-    dashboardHeader(),
+    dashboardHeader(title = "Crime Analytics"),
     dashboardSidebar(
-        selectInput(inputId ="classes_input", label="Select Class", choices=c("CRIMES_AGAINST_THE _PERSON", "CONTACT_RELATED_CRIMES","PROPERTY_RELATED_CRIMES","OTHER_SERIOUS_CRIMES","CRIME_DETECTED_AS_A_RESULT_OF_POLICE_ACTION","SUBCATEGORIES_OF_AGGRAVATED_ROBBERY"))
+        selectInput(inputId ="classes_input", label="Select Class", choices=cl), 
+        
+        sliderInput("TotalCrimes", "Number of Crimes per year", 1,200,100)
     ),
     dashboardBody(
         
-        column(width = 10,
-               plotOutput("crimesperclass")
+        column(1, align="left",
+               plotOutput("crimesperclass", width = "500px",height = "400px")
+        ),
+        column(10,align="right",
+               plotOutput("PlotTCrimes",width = "500px",height = "400px")
         )
     )
     
@@ -23,7 +28,9 @@ ui<- dashboardPage(
 server <- function(input, output){
 
     wdf<-read.csv("crime_data.csv", sep = ",")
-
+    cl <- wdf$classes
+        
+    
     #ldf<-tibble(melt(wdf,id.vars=c("classes","CRIME_CATEGORY"),variable.name="Years"))
    # aldf<-tibble(melt(wdf,id.vars=c("classes"),variable.name="cl"))
     aldf<-melt(wdf,id.vars=c("classes","CRIME_CATEGORY"), measure.vars = c("April_2006_to_March_2007","April_2007_to_March_2008","April_2008_to_March_2009","April_2009_to_March_2010","April_2010_to_March_2011","April_2011_to_March_2012","April_2012_to_March_2013","April_2013_to_March_2014","April_2014_to_March_2015","April_2015_to_March_2016"),
@@ -56,6 +63,12 @@ server <- function(input, output){
         
         return(df_1)
     })
+    
+    totalCrimes <- reactive({
+        df_2<-aldf.agg %>% filter(value>input$TotalCrimes)
+        
+        return(df_2)
+    })
    # mutate(Years= fct_reorder(value, Years)) %>%
     
     output$crimesperclass<-renderPlot({
@@ -68,7 +81,18 @@ server <- function(input, output){
             theme(plot.title = element_text(hjust = 0.5))+
             coord_flip()
         
-    })
+    }, width = 850, height = 550)
+    
+    output$PlotTCrimes <- renderPlot({
+        totalCrimes() %>% 
+            ggplot(aes(x= reorder(Years, value),y=value, fill = Years))+
+            geom_col()+
+            labs(x=element_blank(), y="Number of cases per year", title = "Total Crime Cases")+
+            guides(fill= FALSE)+
+            theme_bw()+
+            theme(plot.title = element_text(hjust = 0.5))+
+            coord_flip()
+    },width = 650, height = 550)
 }
 
 shinyApp(ui = ui, server=server)
