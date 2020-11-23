@@ -7,7 +7,7 @@ library(reshape2)
 library(DT)
 
 
-ui<- dashboardPage(
+ui <- dashboardPage(
     dashboardHeader(title = "Crime Analytics"),
     dashboardSidebar(
         selectInput(inputId ="classes_input", label="Select Class", choices=cl), 
@@ -83,9 +83,14 @@ server <- function(input, output){
         YEARtotals<-c(total_06_07, total_07_08, total_08_09, total_09_10, total_10_11, total_11_12, total_12_13,total_13_14,total_14_15, total_15_16)
         
         df_2 <- data.frame(years=c("April_2006_to_March_2007","April_2007_to_March_2008","April_2008_to_March_2009","April_2009_to_March_2010","April_2010_to_March_2011","April_2011_to_March_2012","April_2012_to_March_2013","April_2013_to_March_2014","April_2014_to_March_2015","April_2015_to_March_2016"),
-                           totals = YEARtotals)
+                           totals = YEARtotals
+                           )
         df_3 <- df_2 %>% filter(totals>input$TotalCrimes)
+        
+        colours <- c(rep("pink"), rep("green"), rep("orange"), rep("red"), rep("blue"), rep("yellow"), rep("dark grey"), rep("light grey"), rep("light blue"), rep("dark green"))
+        
         return(df_3)
+        
     })
    # mutate(Years= fct_reorder(value, Years)) %>%
     
@@ -99,18 +104,20 @@ server <- function(input, output){
             theme(plot.title = element_text(hjust = 0.5))+
             coord_flip()
         
-    }, width = 850, height = 550)
+    })
+    
+    colours <- c(rep("pink",1 ), rep("green", 1), rep("orange",1), rep("red",1), rep("blue", 1), rep("yellow",1), rep("dark grey", 1), rep("light grey", 1), rep("light blue",1), rep("dark green",1))
     
     output$PlotTCrimes <- renderPlot({
     totalCrimes() %>% 
-            ggplot(aes(x=reorder(years, totals),y= totals,fill=totals))+
+            ggplot(aes(x=reorder(years, totals),y= totals, fill= colours ))+
             geom_col()+
             labs(x=element_blank(), y="Number of cases per year", title = "Total Crime Cases")+
             guides(fill= FALSE)+
             theme_bw()+
             theme(plot.title = element_text(hjust = 0.5))+
             coord_flip()
-    },width = 650, height = 550)
+    })
 }
 
 shinyApp(ui = ui, server=server)
