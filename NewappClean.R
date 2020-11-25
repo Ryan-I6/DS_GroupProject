@@ -10,7 +10,7 @@ library(DT)
 ui<- dashboardPage(
   dashboardHeader(title = "Crime Analytics"),
   dashboardSidebar(
-    selectInput(inputId ="classes_input", label="Select class:", choices=c("CRIMES_AGAINST_THE _PERSON", "CONTACT_RELATED_CRIMES", "PROPERTY_RELATED_CRIMES", "OTHER_SERIOUS_CRIMES", "CRIME_DETECTED_AS_A_RESULT_OF_POLICE_ACTION", "SUBCATEGORIES_OF_AGGRAVATED_ROBBERY")), 
+    selectInput(inputId ="classes_input", label="Select Class:", choices=c("CRIMES_AGAINST_THE _PERSON", "CONTACT_RELATED_CRIMES", "PROPERTY_RELATED_CRIMES", "OTHER_SERIOUS_CRIMES", "CRIME_DETECTED_AS_A_RESULT_OF_POLICE_ACTION", "SUBCATEGORIES_OF_AGGRAVATED_ROBBERY")), 
     
     sliderInput("TotalCrimes", "Select minimum Cases:", 100,500,100)
   ),
@@ -37,7 +37,7 @@ server <- function(input, output){
             variable.name="Years") #converting the wdf2 into a long data frame (ldf) to be able to plot the graphs
   
   
-  ldf$value[which(is.na(ldf$value))]<-0  #changing NA values to 0
+ # ldf$value[which(is.na(ldf$value))]<-0  #changing NA values to 0
   
   
   ldf_agg<- aggregate(value~Years+classes,ldf,sum) #grouping the values by years and classes
@@ -64,8 +64,9 @@ server <- function(input, output){
   
   output$CrimesPerClass<-renderPlot({
     data_classes() %>%
-      ggplot(aes(x=reorder(Years,value),y=value,fill=Years))+
-      geom_col()+labs(x=element_blank(),y="Total Crimes",title = "Crimes Statistics per Class")+
+      ggplot(aes(x=reorder(Years,value), y=value, fill=reorder(Years,value)))+
+      geom_col()+
+      labs(x=element_blank(),y="Total Crimes",title = "Crimes Statistics per Class")+
       guides(fill=FALSE)+
       theme_bw()+
       theme(plot.title = element_text(hjust = 0.5))+
@@ -75,7 +76,7 @@ server <- function(input, output){
   
   output$PlotTCrimes <- renderPlot({
     totalCrimes() %>% 
-      ggplot(aes(x= reorder(Years, value),y=value, fill = Years))+
+      ggplot(aes(x=reorder(Years,value), y=value, fill=reorder(Years,value)))+
       geom_col()+
       labs(x=element_blank(), y="Number of cases per year", title = "Total Crime Cases")+
       guides(fill= FALSE)+
@@ -89,3 +90,4 @@ server <- function(input, output){
 }
 
 shinyApp(ui, server)
+
