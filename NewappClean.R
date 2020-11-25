@@ -37,7 +37,7 @@ server <- function(input, output){
             variable.name="Years") #converting the wdf2 into a long data frame (ldf) to be able to plot the graphs
   
   
- # ldf$value[which(is.na(ldf$value))]<-0  #changing NA values to 0
+  ldf$value[which(is.na(ldf$value))]<-0  #changing NA values to 0
   
   
   ldf_agg<- aggregate(value~Years+classes,ldf,sum) #grouping the values by years and classes
