@@ -14,7 +14,7 @@ Data Science group project for crime data
 
 ### Gary Leander 202003490
 
-  -Created first plot (i.e "Crimes statistics per class")
+  -Created first plot (i.e "Crimes statistics per class").
   
   -Also helped with the overall project on all aspects in varying degrees. 
   
@@ -22,7 +22,7 @@ Data Science group project for crime data
 
 ### Ryan Isaacs 202001716
 
-  -Created second plot (i.e "Total crime cases")
+  -Created second plot (i.e "Total crime cases").
   
   -Also helped with the overall project on all aspects in varying degrees. 
 
